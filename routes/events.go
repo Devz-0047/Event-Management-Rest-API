@@ -9,6 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func Home(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Welcome to the Event Management API",
+		"routes": gin.H{
+			"events":       "/events (GET, POST, PUT, DELETE)",
+			"registration": "/events/:id/register (POST, DELETE)",
+			"user":         "/signup, /login",
+		},
+	})
+}
 func getEvents(context *gin.Context) {
 	events, err := models.GetAllEvents()
 	if err != nil {

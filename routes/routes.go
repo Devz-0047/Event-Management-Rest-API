@@ -7,6 +7,7 @@ import (
 
 func RegisterRoutes(server *gin.Engine) {
 	// Event-related routes
+	server.GET("/", Home)
 	server.GET("/events", getEvents)
 	server.GET("/events/:id", getEvent)
 	server.POST("/events", middleware.Authenticate, createEvent)
