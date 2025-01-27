@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"example.com/REST/models"
+	"example.com/REST/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/mattn/go-sqlite3"
 )
@@ -43,6 +44,11 @@ func login(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password"})
 		return
 	}
+	token, err := utils.GenerateToken(user.Email, user.ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not authenticate user"})
+		return
+	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "Login successful!"})
+	context.JSON(http.StatusOK, gin.H{"message": "Login successful!", "token": token})
 }

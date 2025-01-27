@@ -1,0 +1,5 @@
+### Delete a registration for a specific event
+DELETE http://localhost:8080/events/4/register
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlRlc3RAZXhhbXBsZS5jb20iLCJleHAiOjE3Mzg4NjExMjQsInVzZXJJZCI6MX0.hV4QA1WvSMovVVnimfQZX5bqcbkgZBjx4uOcRPqhWhM
+
+Content-Type: application/json

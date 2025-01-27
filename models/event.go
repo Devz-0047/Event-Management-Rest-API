@@ -15,7 +15,7 @@ type Event struct {
 	Description string    `json:"description" binding:"required"`
 	Location    string    `json:"location" binding:"required"`
 	DateTime    time.Time `json:"dateTime" binding:"required"`
-	UserID      int       `json:"userId"`
+	UserID      int64     `json:"userId"`
 }
 
 // Save inserts a new event into the database
@@ -37,7 +37,7 @@ func (e *Event) Save() error {
 	if err != nil {
 		return err
 	}
-	e.ID = id // Assign the generated ID to the event
+	e.ID = id
 	return nil
 }
 
@@ -60,13 +60,14 @@ func GetAllEvents() ([]Event, error) {
 		events = append(events, event)
 	}
 
-	// Check for any errors encountered during iteration
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return events, nil
 }
+
+// GetEventByID retrieves a single event by ID
 func GetEventByID(id int64) (*Event, error) {
 	query := "SELECT id, name, description, location, dateTime, user_id FROM events WHERE id = ?"
 	row := db.DB.QueryRow(query, id)
@@ -81,7 +82,9 @@ func GetEventByID(id int64) (*Event, error) {
 	}
 	return &event, nil
 }
-func (event Event) Update() error {
+
+// Update updates an event in the database
+func (event *Event) Update() error {
 	query := `
 	UPDATE events
 	SET name = ?, description = ?, location = ?, dateTime = ?
@@ -109,7 +112,9 @@ func (event Event) Update() error {
 
 	return nil
 }
-func DeleteEventByID(eventId int64) error {
+
+// DeleteEventByID deletes an event by ID
+func DeleteEventByID(eventID int64) error {
 	query := "DELETE FROM events WHERE id = ?"
 	stmt, err := db.DB.Prepare(query)
 	if err != nil {
@@ -117,7 +122,7 @@ func DeleteEventByID(eventId int64) error {
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(eventId)
+	result, err := stmt.Exec(eventID)
 	if err != nil {
 		return err
 	}
@@ -128,8 +133,35 @@ func DeleteEventByID(eventId int64) error {
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("event with ID %d not found", eventId)
+		return fmt.Errorf("event with ID %d not found", eventID)
 	}
 
-	return nil // Fix: Explicitly return nil here
+	return nil
+}
+
+// Register registers a user for an event
+func (e Event) Register(userId int64) error {
+	query := "INSERT INTO registrations(event_id, user_id) VALUES (?, ?)"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.ID, userId)
+	return err
+}
+func (e Event) CancelRegistration(userId int64) error {
+	query := "DELETE FROM registrations WHERE event_id = ? AND user_id = ?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("failed to prepare cancel registration query: %w", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(e.ID, userId)
+	if err != nil {
+		return fmt.Errorf("failed to cancel registration for user %d: %w", userId, err)
+	}
+	return nil
 }

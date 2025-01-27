@@ -25,6 +25,7 @@ func InitDB() {
 }
 
 func createTables() error {
+	// Create Users Table
 	usersTable := `
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +36,7 @@ func createTables() error {
 		return fmt.Errorf("error creating users table: %w", err)
 	}
 
+	// Create Events Table
 	eventsTable := `
 	CREATE TABLE IF NOT EXISTS events (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,6 +49,19 @@ func createTables() error {
 	);`
 	if _, err := DB.Exec(eventsTable); err != nil {
 		return fmt.Errorf("error creating events table: %w", err)
+	}
+
+	// Create Registrations Table
+	registrationsTable := `
+	CREATE TABLE IF NOT EXISTS registrations (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER,
+		user_id INTEGER,
+		FOREIGN KEY(event_id) REFERENCES events(id),
+		FOREIGN KEY(user_id) REFERENCES users(id)
+	);`
+	if _, err := DB.Exec(registrationsTable); err != nil {
+		return fmt.Errorf("error creating registrations table: %w", err)
 	}
 
 	return nil
