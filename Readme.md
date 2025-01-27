@@ -42,7 +42,7 @@ This project is a RESTful API for managing events and user registrations. It is 
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/yourusername/event-management-api.git
+   git clone https://github.com/Devz-0047/event-management-api.git
    cd event-management-api
    ```
 
